@@ -28,8 +28,6 @@ RUN pnpm --filter frontend build
 
 FROM nginx:stable-alpine AS runner
 
-ENV BACKEND_URL=http://host.docker.internal:4000
-
 COPY apps/frontend/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /workspace/apps/frontend/dist /usr/share/nginx/html
 

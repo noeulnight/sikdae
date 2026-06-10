@@ -68,13 +68,7 @@ Run the frontend container:
 docker run --rm -p 8080:80 sikdae-frontend
 ```
 
-The image serves the built frontend with nginx. `/api` requests are proxied to `http://host.docker.internal:4000` by default, which is convenient when the backend runs on the host machine.
-
-Override the backend URL at runtime:
-
-```bash
-docker run --rm -p 8080:80 -e BACKEND_URL=http://backend-host:4000 sikdae-frontend
-```
+The image serves the built frontend with nginx. API routing is expected to be handled by the public edge router, such as Istio routing `https://sikdae.lth.so/api` to the backend.
 
 If you want the built client to call a different base URL instead of `/api`, pass a build argument:
 
