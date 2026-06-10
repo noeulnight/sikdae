@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>식대 UI Sample</title>
+    <style>
+      :root {
+        --bg: #f7f7f4;
+        --surface: #ffffff;
+        --surface-soft: #f1f3ee;
+        --ink: #171915;
+        --muted: #6b7066;
+        --line: #deded6;
+        --line-strong: #c9cabf;
+        --green: #24735b;
+        --green-soft: #e5f1ea;
+        --amber: #bc7a21;
+        --amber-soft: #fff3d8;
+        --red: #b24536;
+        --blue: #2e5f9f;
+        --shadow: 0 12px 32px rgba(28, 33, 24, 0.08);
+        --radius: 8px;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 15px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: 56px 1fr;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 220px minmax(240px, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        padding: 0 20px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: linear-gradient(135deg, var(--green), #9b6d24);
+        font-size: 17px;
+      }
+
+      .search {
+        position: relative;
+      }
+
+      .search input {
+        width: 100%;
+        height: 38px;
+        padding: 0 108px 0 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+        color: var(--ink);
+        outline: none;
+      }
+
+      .search input:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(36, 115, 91, 0.12);
+        background: var(--surface);
+      }
+
+      .search svg {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+      }
+
+      .search-kbd {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        height: 24px;
+        padding: 0 8px;
+        border-radius: 6px;
+        background: #e6e8df;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .icon-btn,
+      .primary-btn {
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .icon-btn {
+        width: 36px;
+        display: grid;
+        place-items: center;
+      }
+
+      .primary-btn {
+        padding: 0 13px;
+        border-color: var(--green);
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 244px minmax(390px, 560px) minmax(480px, 1fr);
+        min-height: 0;
+      }
+
+      .sidebar,
+      .list-pane,
+      .detail-pane {
+        min-width: 0;
+        min-height: calc(100vh - 56px);
+      }
+
+      .sidebar {
+        padding: 18px 16px;
+        border-right: 1px solid var(--line);
+        background: #fbfbf8;
+      }
+
+      .side-section + .side-section {
+        margin-top: 24px;
+      }
+
+      .section-title {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .category-list,
+      .chip-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .category-item,
+      .chip {
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--ink);
+        border-radius: 8px;
+        min-height: 38px;
+      }
+
+      .category-item {
+        display: grid;
+        grid-template-columns: 28px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px;
+        text-align: left;
+      }
+
+      .category-item img {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+      }
+
+      .category-item.active,
+      .chip.active {
+        background: var(--green-soft);
+        border-color: rgba(36, 115, 91, 0.25);
+        color: var(--green);
+        font-weight: 800;
+      }
+
+      .count {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        width: 100%;
+      }
+
+      .mini-map {
+        height: 142px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(90deg, transparent 49%, rgba(23, 25, 21, 0.06) 50%, transparent 51%) 0 0 /
+            36px 36px,
+          linear-gradient(transparent 49%, rgba(23, 25, 21, 0.06) 50%, transparent 51%) 0 0 / 36px
+            36px,
+          #eef0e8;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .pin {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 0 5px rgba(36, 115, 91, 0.16);
+      }
+
+      .pin:nth-child(1) {
+        left: 62%;
+        top: 30%;
+      }
+
+      .pin:nth-child(2) {
+        left: 45%;
+        top: 52%;
+        background: var(--amber);
+        box-shadow: 0 0 0 5px rgba(188, 122, 33, 0.16);
+      }
+
+      .pin:nth-child(3) {
+        left: 70%;
+        top: 63%;
+        background: var(--blue);
+        box-shadow: 0 0 0 5px rgba(46, 95, 159, 0.14);
+      }
+
+      .list-pane {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .list-head {
+        padding: 18px 18px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .list-head h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      .result-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .segmented {
+        display: inline-grid;
+        grid-auto-flow: column;
+        padding: 3px;
+        border-radius: 8px;
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+      }
+
+      .segmented button {
+        height: 28px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        padding: 0 10px;
+        color: var(--muted);
+      }
+
+      .segmented button.active {
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      .store-list {
+        overflow: auto;
+        padding: 10px;
+      }
+
+      .store-card {
+        display: grid;
+        grid-template-columns: 54px 1fr;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+
+      .store-card + .store-card {
+        margin-top: 8px;
+      }
+
+      .store-card.active {
+        border-color: rgba(36, 115, 91, 0.34);
+        background: #fbfdf9;
+        box-shadow: var(--shadow);
+      }
+
+      .store-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+      }
+
+      .store-icon img {
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+      }
+
+      .store-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .store-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.3;
+      }
+
+      .store-desc {
+        margin: 4px 0 10px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .store-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 24px;
+        border-radius: 999px;
+        padding: 0 8px;
+        background: var(--surface-soft);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .badge.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .badge.amber {
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+
+      .badge.red {
+        background: #fae8e4;
+        color: var(--red);
+      }
+
+      .detail-pane {
+        overflow: auto;
+        background: var(--bg);
+      }
+
+      .detail-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 260px;
+        gap: 18px;
+        padding: 20px;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .detail-title {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.16;
+        letter-spacing: 0;
+      }
+
+      .detail-address {
+        margin: 8px 0 14px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .stat-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .stat {
+        min-width: 94px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 19px;
+        line-height: 1.1;
+      }
+
+      .stat span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .photo-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 112px;
+        gap: 8px;
+      }
+
+      .photo-strip img,
+      .photo-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius);
+        border: 1px solid var(--line);
+        object-fit: cover;
+        background: var(--surface-soft);
+      }
+
+      .photo-placeholder {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .detail-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .section {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 14px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .section-note {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .menu-table {
+        display: grid;
+      }
+
+      .menu-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        min-height: 74px;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .menu-row:last-child {
+        border-bottom: 0;
+      }
+
+      .menu-row h3 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .menu-row p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .price {
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .review-summary {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 14px;
+        padding: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .score {
+        border-radius: var(--radius);
+        background: var(--amber-soft);
+        color: var(--amber);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        min-height: 90px;
+      }
+
+      .score strong {
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .score span {
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .bars {
+        display: grid;
+        gap: 6px;
+        align-content: center;
+      }
+
+      .bar {
+        display: grid;
+        grid-template-columns: 28px 1fr 18px;
+        gap: 8px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .track {
+        height: 7px;
+        border-radius: 999px;
+        background: var(--surface-soft);
+        overflow: hidden;
+      }
+
+      .fill {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--amber);
+      }
+
+      .review-list {
+        display: grid;
+      }
+
+      .review {
+        padding: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .review:last-child {
+        border-bottom: 0;
+      }
+
+      .review-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .review p {
+        margin: 8px 0 0;
+        line-height: 1.5;
+      }
+
+      .review-images {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+
+      .review-images img {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+      }
+
+      .empty-photo {
+        min-height: 124px;
+        display: grid;
+        place-items: center;
+        border: 1px dashed var(--line-strong);
+        color: var(--muted);
+        border-radius: var(--radius);
+        background: #fafaf6;
+        font-weight: 800;
+      }
+
+      @media (max-width: 1180px) {
+        .shell {
+          grid-template-columns: 210px minmax(360px, 0.9fr) minmax(430px, 1.1fr);
+        }
+
+        .detail-hero,
+        .detail-body {
+          grid-template-columns: 1fr;
+        }
+
+        .photo-strip {
+          grid-template-columns: repeat(4, 1fr);
+          grid-auto-rows: 90px;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .topbar {
+          grid-template-columns: 1fr;
+          height: auto;
+          padding: 12px;
+        }
+
+        .shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar,
+        .list-pane,
+        .detail-pane {
+          min-height: auto;
+        }
+
+        .sidebar {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .category-list {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .list-pane {
+          border-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">식</div>
+          <span>식대</span>
+        </div>
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+          <input value="강남 돈까스" aria-label="매장 검색" />
+          <span class="search-kbd">452개 매장</span>
+        </label>
+        <div class="top-actions">
+          <button class="icon-btn" aria-label="지도 보기">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Zm0 0V3m6 18V6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </button>
+          <button class="primary-btn">주문 가능</button>
+        </div>
+      </header>
+
+      <div class="shell">
+        <aside class="sidebar" aria-label="필터">
+          <section class="side-section">
+            <h2 class="section-title">음식 종류</h2>
+            <div class="category-list">
+              <button class="category-item active">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104706522.png"
+                  alt=""
+                />
+                <span>한식</span>
+                <span class="count">152</span>
+              </button>
+              <button class="category-item">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104610164.png"
+                  alt=""
+                />
+                <span>일식</span>
+                <span class="count">48</span>
+              </button>
+              <button class="category-item">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104628114.png"
+                  alt=""
+                />
+                <span>중식</span>
+                <span class="count">37</span>
+              </button>
+              <button class="category-item">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage/2021/img20Westernfood%403x.png"
+                  alt=""
+                />
+                <span>샐러드</span>
+                <span class="count">22</span>
+              </button>
+              <button class="category-item">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104651857.png"
+                  alt=""
+                />
+                <span>카페/디저트</span>
+                <span class="count">31</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="side-section">
+            <h2 class="section-title">이용 방식</h2>
+            <div class="chip-list">
+              <button class="chip active">
+                <span>방문식사</span>
+                <span class="count">LOCAL</span>
+              </button>
+              <button class="chip">
+                <span>전화배달</span>
+                <span class="count">DELIVERY</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="side-section">
+            <h2 class="section-title">근처 매장</h2>
+            <div class="mini-map" aria-label="매장 위치 미리보기">
+              <span class="pin"></span>
+              <span class="pin"></span>
+              <span class="pin"></span>
+            </div>
+          </section>
+        </aside>
+
+        <section class="list-pane" aria-label="매장 목록">
+          <div class="list-head">
+            <h1>강남 주변 식사처</h1>
+            <div class="result-meta">
+              <span>452개 중 평점/리뷰 신호가 있는 매장 우선</span>
+              <div class="segmented" aria-label="정렬">
+                <button class="active">추천순</button>
+                <button>거리순</button>
+                <button>평점순</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="store-list">
+            <article class="store-card active">
+              <div class="store-icon">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104706522.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <div class="store-title-row">
+                  <h2 class="store-title">계몽돈까스</h2>
+                  <span class="badge amber">★ 4.83</span>
+                </div>
+                <p class="store-desc">서울특별시 강남구 역삼동 834-6</p>
+                <div class="store-meta">
+                  <span class="badge green">방문식사</span>
+                  <span class="badge">메뉴 3</span>
+                  <span class="badge">리뷰 6</span>
+                  <span class="badge">사진 4</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="store-card">
+              <div class="store-icon">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104706522.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <div class="store-title-row">
+                  <h2 class="store-title">감성족발(강남점)</h2>
+                  <span class="badge">평점 없음</span>
+                </div>
+                <p class="store-desc">점심 특선 족발, 보쌈, 고기 막국수 종류 할인 행사 진행중</p>
+                <div class="store-meta">
+                  <span class="badge green">방문식사</span>
+                  <span class="badge">메뉴 32</span>
+                  <span class="badge red">리뷰 없음</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="store-card">
+              <div class="store-icon">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104706522.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <div class="store-title-row">
+                  <h2 class="store-title">강남김밥공장</h2>
+                  <span class="badge">06:50</span>
+                </div>
+                <p class="store-desc">06:50-21:00</p>
+                <div class="store-meta">
+                  <span class="badge green">방문식사</span>
+                  <span class="badge">메뉴 17</span>
+                  <span class="badge">한식</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="store-card">
+              <div class="store-icon">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage/2021/img20Westernfood%403x.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <div class="store-title-row">
+                  <h2 class="store-title">갓즈포케 강남</h2>
+                  <span class="badge amber">★ 5.0</span>
+                </div>
+                <p class="store-desc">운영시간 11시 30분~21시</p>
+                <div class="store-meta">
+                  <span class="badge green">방문식사</span>
+                  <span class="badge">샐러드</span>
+                  <span class="badge">리뷰 1</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="store-card">
+              <div class="store-icon">
+                <img
+                  src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/etc-filestorage%2F2020%2F20200820104628114.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <div class="store-title-row">
+                  <h2 class="store-title">강남 수향</h2>
+                  <span class="badge">중식</span>
+                </div>
+                <p class="store-desc">서울 강남구 인근 방문식사 가능 매장</p>
+                <div class="store-meta">
+                  <span class="badge green">방문식사</span>
+                  <span class="badge">사진 없음</span>
+                  <span class="badge">평점 없음</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="detail-pane" aria-label="매장 상세">
+          <header class="detail-hero">
+            <div>
+              <div class="store-meta" style="margin-bottom: 10px">
+                <span class="badge green">방문식사</span>
+                <span class="badge">Captain Pay</span>
+                <span class="badge">025688242</span>
+              </div>
+              <h1 class="detail-title">계몽돈까스</h1>
+              <p class="detail-address">서울특별시 강남구 역삼동 834-6</p>
+              <div class="stat-row">
+                <div class="stat">
+                  <strong>4.83</strong>
+                  <span>평점</span>
+                </div>
+                <div class="stat">
+                  <strong>6</strong>
+                  <span>리뷰</span>
+                </div>
+                <div class="stat">
+                  <strong>3</strong>
+                  <span>메뉴</span>
+                </div>
+                <div class="stat">
+                  <strong>4</strong>
+                  <span>사진</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="photo-strip" aria-label="리뷰 사진">
+              <img
+                src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/2_image_null_1728569574246.jpg"
+                alt="계몽돈까스 리뷰 사진"
+              />
+              <img
+                src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/1_image_null_1728569572210.jpg"
+                alt="계몽돈까스 리뷰 사진"
+              />
+              <img
+                src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/0_image_null_1728569570218.jpg"
+                alt="계몽돈까스 리뷰 사진"
+              />
+              <img
+                src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/5971/0_thumb_null_1664938366102.JPG"
+                alt="계몽돈까스 리뷰 사진"
+              />
+            </div>
+          </header>
+
+          <div class="detail-body">
+            <div class="section">
+              <div class="section-head">
+                <h2>메뉴</h2>
+                <span class="section-note">사이드 3개</span>
+              </div>
+              <div class="menu-table">
+                <article class="menu-row">
+                  <div>
+                    <h3>캔사이다</h3>
+                    <p>캔사이다</p>
+                  </div>
+                  <div class="price">2,500원</div>
+                </article>
+                <article class="menu-row">
+                  <div>
+                    <h3>캔콜라</h3>
+                    <p>캔콜라</p>
+                  </div>
+                  <div class="price">2,500원</div>
+                </article>
+                <article class="menu-row">
+                  <div>
+                    <h3>콜라 1.25L</h3>
+                    <p>콜라 1.25L</p>
+                  </div>
+                  <div class="price">3,500원</div>
+                </article>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h2>리뷰</h2>
+                <span class="section-note">댓글 1 · 좋아요 3</span>
+              </div>
+              <div class="review-summary">
+                <div class="score">
+                  <div>
+                    <strong>4.83</strong>
+                    <span>6개 리뷰</span>
+                  </div>
+                </div>
+                <div class="bars">
+                  <div class="bar">
+                    <span>5점</span>
+                    <span class="track"><span class="fill" style="width: 83%"></span></span>
+                    <span>5</span>
+                  </div>
+                  <div class="bar">
+                    <span>4점</span>
+                    <span class="track"><span class="fill" style="width: 17%"></span></span>
+                    <span>1</span>
+                  </div>
+                  <div class="bar">
+                    <span>3점</span>
+                    <span class="track"><span class="fill" style="width: 0%"></span></span>
+                    <span>0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="review-list">
+                <article class="review">
+                  <div class="review-head">
+                    <span>알파카 · ★ 5</span>
+                    <span>2024.10.10</span>
+                  </div>
+                  <p>알파카의 메뉴판 사진</p>
+                  <div class="review-images">
+                    <img
+                      src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/0_image_null_1728569570218.jpg"
+                      alt=""
+                    />
+                    <img
+                      src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/1_image_null_1728569572210.jpg"
+                      alt=""
+                    />
+                    <img
+                      src="https://s3.ap-northeast-2.amazonaws.com/vendys.etc/sikdae/review/null/16194/2_image_null_1728569574246.jpg"
+                      alt=""
+                    />
+                  </div>
+                </article>
+                <article class="review">
+                  <div class="review-head">
+                    <span>5층주민 · ★ 5</span>
+                    <span>2024.10.09</span>
+                  </div>
+                  <p>음식 포션 많아요 돈카츠 테이스티해요</p>
+                </article>
+                <article class="review">
+                  <div class="review-head">
+                    <span>익명 · ★ 5</span>
+                    <span>2022.10.05</span>
+                  </div>
+                  <p>맛있고 좋아요. 가격이 안적혀 있어 기록용 남겨둡니다.</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
