@@ -123,19 +123,6 @@ export class StoreRecommendationQueryDto {
   @Min(1, { each: true })
   categoryIds?: number[];
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  mainCategoryId?: number;
-
-  @IsOptional()
-  @Transform(({ value }) => toNumberArray(value))
-  @IsArray()
-  @IsInt({ each: true })
-  @Min(1, { each: true })
-  mainCategoryIds?: number[];
-
   @Type(() => Number)
   @IsNumber()
   @Min(1)

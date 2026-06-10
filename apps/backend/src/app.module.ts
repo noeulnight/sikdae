@@ -9,6 +9,7 @@ import { validationSchema } from "./config/validation-schema";
 import { CacheModule } from "./cache/cache.module";
 import { SikdaeModule } from "./sikdae/sikdae.module";
 import { StoreModule } from "./store/store.module";
+import { WalletModule } from "./wallet/wallet.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { StoreModule } from "./store/store.module";
     CacheModule,
     SikdaeModule,
     StoreModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],

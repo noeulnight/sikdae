@@ -63,13 +63,6 @@ export class StoreController {
     description: "Comma separated category ids. Omit for all categories.",
   })
   @ApiQuery({ name: "categoryId", required: false, type: Number })
-  @ApiQuery({ name: "mainCategoryId", required: false, type: Number })
-  @ApiQuery({
-    name: "mainCategoryIds",
-    required: false,
-    type: String,
-    description: "Comma separated main category ids for legacy clients.",
-  })
   @ApiQuery({ name: "rangeMeters", required: true, type: Number })
   @ApiQuery({ name: "lat", required: true, type: Number })
   @ApiQuery({ name: "lng", required: true, type: Number })

@@ -98,15 +98,10 @@ export class StoreService {
   ): Promise<StoreRecommendationResult> {
     const response = await this.retrieveStores();
     const categoryIds = this.resolveRecommendationCategoryIds(query);
-    const mainCategoryIds = this.resolveRecommendationMainCategoryIds(query);
     const candidates = response.stores
       .filter((store) => {
         if (categoryIds.length) {
           return categoryIds.includes(store.category.id);
-        }
-
-        if (mainCategoryIds.length) {
-          return store.mainCategories.some((category) => mainCategoryIds.includes(category.id));
         }
 
         return true;
@@ -140,12 +135,6 @@ export class StoreService {
     return [...new Set(query.categoryIds?.length ? query.categoryIds : [query.categoryId])].filter(
       (categoryId): categoryId is number => categoryId !== undefined,
     );
-  }
-
-  private resolveRecommendationMainCategoryIds(query: StoreRecommendationQueryDto): number[] {
-    return [
-      ...new Set(query.mainCategoryIds?.length ? query.mainCategoryIds : [query.mainCategoryId]),
-    ].filter((categoryId): categoryId is number => categoryId !== undefined);
   }
 
   async retrieveStore(storeId: string): Promise<StoreDetailResult> {

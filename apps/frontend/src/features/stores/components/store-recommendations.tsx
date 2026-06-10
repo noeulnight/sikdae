@@ -327,12 +327,7 @@ function RecommendationResults({
   return (
     <div className="grid gap-2">
       {items.map((store) => (
-        <RecommendationItem
-          key={store.id}
-          store={store}
-          supplies={supplies}
-          onSelect={onSelect}
-        />
+        <RecommendationItem key={store.id} store={store} supplies={supplies} onSelect={onSelect} />
       ))}
     </div>
   );
