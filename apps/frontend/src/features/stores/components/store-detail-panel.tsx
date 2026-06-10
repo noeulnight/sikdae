@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStoreDetailQuery, useStoreReviewsQuery } from "../queries/store-queries";
-import type { StoreMenu, StoreMenuCategory, StoreReview } from "../types/store";
+import type { StoreMenu, StoreMenuCategory, StoreReview, StoreReviewImage } from "../types/store";
 import {
   formatDate,
   formatNumber,
@@ -358,19 +358,32 @@ function ReviewList({ isLoading, reviews }: { isLoading: boolean; reviews?: Stor
           {review.images.length ? (
             <div className="flex gap-2 overflow-x-auto">
               {review.images.map((image) => (
-                <img
-                  key={image.id}
-                  src={image.thumbnailUrl ?? image.mainUrl ?? ""}
-                  alt=""
-                  className="size-16 rounded-md object-cover"
-                  loading="lazy"
-                />
+                <ReviewImage key={image.id} image={image} />
               ))}
             </div>
           ) : null}
         </article>
       ))}
     </div>
+  );
+}
+
+function ReviewImage({ image }: { image: StoreReviewImage }) {
+  const [visible, setVisible] = useState(true);
+  const src = image.thumbnailUrl ?? image.mainUrl;
+
+  if (!src || !visible) {
+    return null;
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      className="size-16 shrink-0 rounded-md object-cover"
+      loading="lazy"
+      onError={() => setVisible(false)}
+    />
   );
 }
 

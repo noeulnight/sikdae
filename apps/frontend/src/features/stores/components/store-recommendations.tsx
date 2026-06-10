@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, MapPin, RefreshCw, Shuffle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Loader2, RefreshCw, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,8 +20,7 @@ import { useCurrentLocation } from "../hooks/use-current-location";
 import { useStoreRecommendationsMutation } from "../queries/store-queries";
 import type { StoreCategoriesResponse, StoreRecommendation, StoreSupply } from "../types/store";
 import { getStoreRequestErrorMessage } from "../utils/api-error";
-import { formatDistance, formatRating, getStoreImage, getSupplyName } from "../utils/format";
-import { StoreImage } from "./store-image";
+import { getStoreRowAccessibleName, StoreListRow } from "./store-list-row";
 
 type StoreRecommendationsProps = {
   categories?: StoreCategoriesResponse;
@@ -329,7 +327,12 @@ function RecommendationResults({
   return (
     <div className="grid gap-2">
       {items.map((store) => (
-        <RecommendationItem key={store.id} store={store} supplies={supplies} onSelect={onSelect} />
+        <RecommendationItem
+          key={store.id}
+          store={store}
+          supplies={supplies}
+          onSelect={onSelect}
+        />
       ))}
     </div>
   );
@@ -345,39 +348,15 @@ function RecommendationItem({
   onSelect: (storeId: string) => void;
 }) {
   return (
-    <div className="rounded-lg border">
+    <div className="rounded-lg border border-transparent transition-colors hover:bg-muted/70">
       <Button
         type="button"
         variant="ghost"
-        className="h-auto min-w-0 justify-start p-0 text-left hover:bg-transparent"
+        className="h-auto w-full min-w-0 justify-start p-0 text-left whitespace-normal hover:bg-transparent"
+        aria-label={getStoreRowAccessibleName(store, supplies, store.distanceMeters)}
         onClick={() => onSelect(store.id)}
       >
-        <div className="flex min-w-0 gap-3 p-2">
-          <div className="size-16 shrink-0 overflow-hidden rounded-md">
-            <StoreImage
-              src={getStoreImage(store)}
-              alt={store.name}
-              fallback={<MapPin className="size-5" aria-hidden="true" />}
-            />
-          </div>
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-              <p className="min-w-0 truncate text-sm font-medium">{store.name}</p>
-              <Badge variant="secondary">{formatDistance(store.distanceMeters)}</Badge>
-            </div>
-            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-              {store.supply.map((supply) => (
-                <Badge key={supply} variant="outline">
-                  {getSupplyName(supply, supplies)}
-                </Badge>
-              ))}
-              <span className="text-xs text-muted-foreground">{store.category.name}</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {formatRating(store.rating.score, store.rating.count)}
-            </p>
-          </div>
-        </div>
+        <StoreListRow distanceMeters={store.distanceMeters} store={store} supplies={supplies} />
       </Button>
     </div>
   );

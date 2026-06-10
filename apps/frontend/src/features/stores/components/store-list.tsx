@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +12,8 @@ import type {
 } from "../types/store";
 import { getStoreRequestErrorMessage } from "../utils/api-error";
 import { calculateDistanceMeters, isValidGeoLocation } from "../utils/geo";
-import { formatDistance, formatNumber, formatRating, getSupplyName } from "../utils/format";
+import { formatNumber } from "../utils/format";
+import { getStoreRowAccessibleName, StoreListRow } from "./store-list-row";
 
 type StoreListProps = {
   error: unknown;
@@ -118,14 +118,10 @@ export function StoreList({
                   type="button"
                   variant="ghost"
                   className="h-auto w-full min-w-0 justify-start p-0 text-left whitespace-normal hover:bg-transparent"
-                  aria-label={getStoreAccessibleName(store, supplies, distanceMeters)}
+                  aria-label={getStoreRowAccessibleName(store, supplies, distanceMeters)}
                   onClick={() => onSelect(store.id)}
                 >
-                  <StoreListItem
-                    distanceMeters={distanceMeters}
-                    store={store}
-                    supplies={supplies}
-                  />
+                  <StoreListRow distanceMeters={distanceMeters} store={store} supplies={supplies} />
                 </Button>
               </div>
             );
@@ -212,89 +208,6 @@ function getPaginationItems(currentPage: number, totalPages: number): Array<"ell
   return [1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis", totalPages];
 }
 
-function StoreListItem({
-  distanceMeters,
-  store,
-  supplies,
-}: {
-  distanceMeters?: number;
-  store: StoreSummary;
-  supplies?: StoreSupply[];
-}) {
-  const hasRating = store.rating.count > 0;
-  const categoryNames = getStoreCategoryNames(store);
-
-  return (
-    <div className="w-full rounded-lg p-3">
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-              <p className="min-w-0 truncate text-sm font-medium text-foreground">{store.name}</p>
-              {distanceMeters !== undefined ? (
-                <Badge variant="secondary">{formatDistance(distanceMeters)}</Badge>
-              ) : null}
-              {store.supply.map((supply) => (
-                <Badge key={supply} variant="outline">
-                  {getSupplyName(supply, supplies)}
-                </Badge>
-              ))}
-              {store.flags.recommended ? <Badge variant="secondary">추천</Badge> : null}
-              {store.flags.new ? <Badge variant="secondary">신규</Badge> : null}
-            </div>
-            <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-              {categoryNames.map((categoryName) => (
-                <span key={categoryName}>{categoryName}</span>
-              ))}
-            </div>
-          </div>
-          <div
-            className={
-              hasRating
-                ? "shrink-0 text-right text-xs font-medium text-foreground whitespace-nowrap"
-                : "shrink-0 text-right text-xs text-muted-foreground whitespace-nowrap"
-            }
-          >
-            {formatRating(store.rating.score, store.rating.count)}
-          </div>
-        </div>
-
-        {store.description ? (
-          <p className="line-clamp-1 text-xs text-muted-foreground">{store.description}</p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function getStoreAccessibleName(
-  store: StoreSummary,
-  supplies?: StoreSupply[],
-  distanceMeters?: number,
-) {
-  const supplyText = store.supply.map((supply) => getSupplyName(supply, supplies)).join(", ");
-  const additionalCategoryText = getStoreCategoryNames(store)
-    .filter((categoryName) => categoryName !== store.category.name)
-    .join(", ");
-  const badgeText = [
-    store.flags.recommended ? "추천 매장" : null,
-    store.flags.new ? "신규 매장" : null,
-  ]
-    .filter(Boolean)
-    .join(", ");
-  const parts = [
-    store.name,
-    supplyText ? `제공 방식 ${supplyText}` : null,
-    store.category.name ? `분류 ${store.category.name}` : null,
-    additionalCategoryText ? `카테고리 ${additionalCategoryText}` : null,
-    distanceMeters !== undefined ? `거리 ${formatDistance(distanceMeters)}` : null,
-    getStoreRatingLabel(store),
-    badgeText,
-  ].filter(Boolean);
-
-  return parts.join(". ");
-}
-
 function getDistanceOrigin(filters: StoreFilters): StoreLocation | undefined {
   if (
     filters.sort !== "distance" ||
@@ -312,20 +225,6 @@ function getDistanceOrigin(filters: StoreFilters): StoreLocation | undefined {
     lat: filters.lat,
     lng: filters.lng,
   };
-}
-
-function getStoreCategoryNames(store: StoreSummary) {
-  return Array.from(
-    new Set([store.category.name, ...store.mainCategories.map((category) => category.name)]),
-  );
-}
-
-function getStoreRatingLabel(store: StoreSummary) {
-  if (store.rating.count === 0) {
-    return "평점 없음";
-  }
-
-  return `평점 ${formatRating(store.rating.score, store.rating.count)}`;
 }
 
 function StoreListSkeleton() {
