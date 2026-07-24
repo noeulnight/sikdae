@@ -1,5 +1,14 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, MapPin, MessageSquareText, Phone, Star, Utensils } from "lucide-react";
+import {
+  ChevronLeft,
+  MapPin,
+  MessageSquareText,
+  Navigation,
+  Phone,
+  Share2,
+  Star,
+  Utensils,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +27,7 @@ import {
   getStoreImage,
   getSupplyName,
 } from "../utils/format";
+import { getNaverMapUrl, shareStore } from "../utils/store-links";
 import type { StoreReviewSummary, StoreSupply } from "../types/store";
 import { StoreImage } from "./store-image";
 import { StoreLocationMap } from "./store-location-map";
@@ -29,6 +39,10 @@ type StoreDetailPanelProps = {
 };
 
 export function StoreDetailPanel({ storeId, supplies, onBackToList }: StoreDetailPanelProps) {
+  const [shareState, setShareState] = useState<{
+    status: "copied" | "error";
+    storeId: string;
+  }>();
   const detailQuery = useStoreDetailQuery(storeId);
   const reviewsQuery = useStoreReviewsQuery(storeId);
   const detail = detailQuery.data;
@@ -65,7 +79,20 @@ export function StoreDetailPanel({ storeId, supplies, onBackToList }: StoreDetai
     );
   }
 
-  const detailImage = getStoreImage(detail.store);
+  const store = detail.store;
+  const detailImage = getStoreImage(store);
+  const shareStatus = shareState?.storeId === store.id ? shareState.status : "idle";
+
+  async function handleShare() {
+    try {
+      const result = await shareStore(store.name, window.location.href);
+      if (result === "copied") {
+        setShareState({ status: "copied", storeId: store.id });
+      }
+    } catch {
+      setShareState({ status: "error", storeId: store.id });
+    }
+  }
 
   return (
     <Card className="lg:h-full lg:min-h-0">
@@ -88,7 +115,7 @@ export function StoreDetailPanel({ storeId, supplies, onBackToList }: StoreDetai
             목록
           </Button>
         ) : null}
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               {detail.store.supply.map((supply) => (
@@ -102,6 +129,18 @@ export function StoreDetailPanel({ storeId, supplies, onBackToList }: StoreDetai
               {detail.store.flags.booking ? <Badge variant="secondary">예약</Badge> : null}
             </div>
             <CardTitle>{detail.store.name}</CardTitle>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => void handleShare()}>
+              <Share2 data-icon="inline-start" />
+              {shareStatus === "copied" ? "복사됨" : shareStatus === "error" ? "공유 실패" : "공유"}
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a href={getNaverMapUrl(detail.store)} target="_blank" rel="noopener noreferrer">
+                <Navigation data-icon="inline-start" />
+                네이버지도
+              </a>
+            </Button>
           </div>
         </div>
       </CardHeader>

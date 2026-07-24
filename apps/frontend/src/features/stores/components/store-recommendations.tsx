@@ -20,6 +20,7 @@ import { useCurrentLocation } from "../hooks/use-current-location";
 import { useStoreRecommendationsMutation } from "../queries/store-queries";
 import type { StoreCategoriesResponse, StoreRecommendation, StoreSupply } from "../types/store";
 import { getStoreRequestErrorMessage } from "../utils/api-error";
+import { formatDistance } from "../utils/format";
 import { getStoreRowAccessibleName, StoreListRow } from "./store-list-row";
 
 type StoreRecommendationsProps = {
@@ -28,13 +29,6 @@ type StoreRecommendationsProps = {
   onRecommend?: () => void;
   onSelect: (storeId: string) => void;
 };
-
-const RANGE_OPTIONS = [
-  { label: "500m", value: 500 },
-  { label: "1km", value: 1_000 },
-  { label: "2km", value: 2_000 },
-  { label: "5km", value: 5_000 },
-];
 
 export function StoreRecommendations({
   categories,
@@ -243,19 +237,22 @@ function RecommendationPanelContent({
         </div>
       </FilterSection>
 
-      <FilterSection title="거리">
-        <div className="grid grid-cols-4 gap-2">
-          {RANGE_OPTIONS.map((range) => (
-            <Button
-              key={range.value}
-              type="button"
-              variant={rangeMeters === range.value ? "default" : "outline"}
-              size="sm"
-              onClick={() => onSetRangeMeters(range.value)}
-            >
-              {range.label}
-            </Button>
-          ))}
+      <FilterSection title={`거리 · ${formatDistance(rangeMeters)}`}>
+        <div className="space-y-1">
+          <input
+            type="range"
+            min={100}
+            max={5_000}
+            step={100}
+            value={rangeMeters}
+            aria-label="추천 거리"
+            className="w-full accent-primary"
+            onChange={(event) => onSetRangeMeters(Number(event.currentTarget.value))}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>100m</span>
+            <span>5km</span>
+          </div>
         </div>
       </FilterSection>
 

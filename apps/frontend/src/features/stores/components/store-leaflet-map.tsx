@@ -17,7 +17,7 @@ type StoreLeafletMapProps = {
   zoom?: number;
 };
 
-const TILE_LAYER_URL = "https://osm.lth.so/tiles/base/{z}/{x}/{y}.png";
+const TILE_LAYER_URL = "https://d.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png";
 const DEFAULT_ZOOM = 16;
 const FALLBACK_LOCATION: StoreLocation = {
   lat: 37.500_918,
@@ -56,7 +56,8 @@ export function StoreLeafletMap({
     const markerLayer = L.layerGroup().addTo(map);
 
     L.tileLayer(TILE_LAYER_URL, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
       maxZoom: 19,
       minZoom: 3,
     }).addTo(map);
