@@ -22,7 +22,7 @@ catalog:
   "@nestjs/config": ^4.0.4
   reflect-metadata: ^0.2.2
   rxjs: ^7.8.2
-  joi: ^18.2.1
+  joi: ^18.2.6
   class-transformer: ^0.5.1
   class-validator: ^0.15.1
   "@nestjs/cli": ^11.0.22
